@@ -7,10 +7,11 @@ class App extends React.Component {
     pageHeader: 'Naming Contests'
   };
   componentDidMount(){
-    // timers, liseners
+    // timers, liseners... ajax etc
   }
   componentWillMount(){
-    // clean timrs, listeners
+    // clean timers, listeners... removes gunk from didMout
+
   }
   render() {
     return (
