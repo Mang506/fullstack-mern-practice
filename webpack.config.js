@@ -9,6 +9,14 @@ module.exports = {
   module: {
     rules: [
       {
+        type: 'javascript/auto',
+        test: /\.json$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'json-loader'
+        }
+      },
+      {
         test: /\.js$/,
         exclude: /node_modules/,
         use: {
