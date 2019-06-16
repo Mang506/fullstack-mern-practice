@@ -1,2 +1,4 @@
-# fullstack-mern-practice
-Practicing MERN stack development
+## Fullstack MERN Practice
+
+
+#Practicing MERN stack development
