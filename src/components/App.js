@@ -13,7 +13,6 @@ class App extends React.Component {
     initialData: PropTypes.object.isRequired
   }
   state = this.props.initialData;
-
   componentDidMount() {
 
   }
@@ -22,18 +21,30 @@ class App extends React.Component {
   }
   fetchContest = (contestId) => {
     pushState(
-      { currentContestId: contestId},
+      { currentContestId: contestId },
       `/contest/${contestId}`
     );
     api.fetchContest(contestId).then(contest => {
       this.setState({
         currentContestId: contest.id,
-        contest: {
+        contests: {
           ...this.state.contests,
           [contest.id]: contest
         }
       });
-    });    
+    });
+  };
+  fetchContestList = () => {
+    pushState(
+      { currentContestId: null },
+      '/'
+    );
+    api.fetchContestList().then(contests => {
+      this.setState({
+        currentContestId: null,
+        contests
+      });
+    });
   };
   currentContest(){
     return this.state.contests[this.state.currentContestId];
@@ -47,7 +58,9 @@ class App extends React.Component {
   }
   currentContent() {
     if(this.state.currentContestId){
-      return <Contest {...this.currentContest()} />;
+      return <Contest 
+        contestListClick={this.fetchContestList}
+        {...this.currentContest()} />;
     }
 
     return <ContestList 
