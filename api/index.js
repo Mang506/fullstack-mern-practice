@@ -4,9 +4,14 @@ import assert from 'assert';
 import config from '../config';
 
 let mdb;
-MongoClient.connect(config.mongodbUri, {
-  useNewUrlParser: true
-}, (err, client) => {
+// MongoClient.connect(config.mongodbUri, {
+//   useNewUrlParser: true
+// }, (err, client) => {
+//   assert.equal(null, err);
+//   mdb = client.db('test');
+// });
+
+MongoClient.connect(config.mongodbUri, { useNewUrlParser: true }, (err, client) => {
   assert.equal(null, err);
   mdb = client.db('test');
 });
@@ -40,10 +45,8 @@ router.get('/names/:nameIds', (req, res) => {
     .each((err, name) => {
       assert.equal(null, err);
 
-      if (!name) { // no more names to process
-        res.send({
-          names
-        });
+      if (!name) { // no more names
+        res.send({ names });
         return;
       }
 
@@ -56,7 +59,33 @@ router.get('/contests/:contestId', (req, res) => {
   mdb.collection('contests')
     .findOne({ _id: ObjectID(req.params.contestId) })
     .then(contest => res.send(contest))
-    .catch(console.error);
+    .catch(error => {
+      console.error(error);
+      res.status(404).send('Bad Request');
+    }); 
+});
+
+router.post('/names', (req, res) => {
+  // testing with res.send -- res.send(req.body);
+  const contestId = ObjectID(req.body.contestId);
+  const name = req.body.newName;
+  //validation usually goes here ...
+  mdb.collection('names').insertOne({ name }).then(result => 
+    mdb.collection('contests').findAndModify(
+      { _id: contestId},
+      [],
+      { $push: { nameIds: result.insertedId} },
+      { new: true }
+    ).then(doc => 
+      res.send({
+        updatedContest: doc.value,
+        newName: { _id: result.insertedId, name }
+      })
+    )
+  ).catch(error => {
+    console.error(error);
+    res.status(404).send('Bad Request');
+  });
 });
 
 export default router;
